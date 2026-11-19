@@ -10,7 +10,11 @@ Every lesson has a notes file in `docs/` and is committed separately.
 
 (More lessons are added as we go.)
 
+## Commands
+Frequently used Docker, Maven, MySQL and curl commands: [commands/README.md](commands/README.md)
+
 ## Quick start
+Requires JDK 25 (install steps in the commands file).
 ```bash
 docker compose up -d     # starts MySQL on localhost:3307
 mvn clean package        # builds all services

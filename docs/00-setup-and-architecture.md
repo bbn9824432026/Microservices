@@ -40,9 +40,9 @@ payment/notification services, observability and Kubernetes.
 ## Tools used
 | Tool | Version | Purpose |
 |---|---|---|
-| JDK | 17 | Java runtime (Spring Boot 3.3 supports 17+) |
+| JDK | 25 | Java runtime (Spring Boot 4.1 supports 17 to 26) |
 | Maven | 3.9 | Build |
-| Spring Boot | 3.3.5 | Framework |
+| Spring Boot | 4.1.2 | Framework |
 | MySQL | 8.4 (Docker) | Database |
 | Docker | any recent | Runs MySQL |
 | Postman or curl | any | Call the APIs |
