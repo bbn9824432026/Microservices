@@ -1,0 +1,28 @@
+spring:
+  application:
+    name: product-service
+
+  # Connects ONLY to product_db with product_user (see infra/mysql/init.sql).
+  # Port 3307 is the host port that docker-compose maps to MySQL.
+  datasource:
+    url: jdbc:mysql://localhost:3307/product_db
+    username: product_user
+    password: product_pass
+
+  jpa:
+    hibernate:
+      # "update" creates/changes tables automatically. Fine for learning.
+      # In real projects use a migration tool (Flyway/Liquibase) and set this to "validate".
+      ddl-auto: update
+    # Print the SQL Hibernate runs, so you can see what happens on each API call
+    show-sql: true
+    open-in-view: false
+
+server:
+  port: 8081
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info

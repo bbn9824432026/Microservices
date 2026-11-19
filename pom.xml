@@ -27,6 +27,6 @@
     </properties>
 
     <modules>
-        <!-- Services are added here lesson by lesson -->
+        <module>product-service</module>
     </modules>
 </project>

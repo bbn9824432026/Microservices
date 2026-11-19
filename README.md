@@ -7,6 +7,7 @@ Every lesson has a notes file in `docs/` and is committed separately.
 | # | Lesson | Notes |
 |---|---|---|
 | 0 | Setup and architecture | [docs/00-setup-and-architecture.md](docs/00-setup-and-architecture.md) |
+| 1.1 | product-service (Spring Boot + JPA + MySQL) | [docs/01-1-product-service.md](docs/01-1-product-service.md) |
 
 (More lessons are added as we go.)
 
