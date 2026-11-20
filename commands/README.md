@@ -92,6 +92,7 @@ Connection details from your machine: host `localhost`, port **3307**.
 ```bash
 curl -i http://localhost:8081/actuator/health                                  # health check
 curl -i http://localhost:8081/api/products                                     # GET list
+curl -i http://localhost:8082/api/orders                                       # GET orders (order-service)
 curl -i -X POST http://localhost:8081/api/products \
   -H "Content-Type: application/json" \
   -d '{"name":"Laptop","price":55000,"stock":10}'                              # POST JSON

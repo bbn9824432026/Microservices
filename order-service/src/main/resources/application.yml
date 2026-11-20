@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: order-service
+
+  # order-service connects ONLY to order_db with order_user.
+  # It has no permission on product_db (see infra/mysql/init.sql).
+  datasource:
+    url: jdbc:mysql://localhost:3307/order_db
+    username: order_user
+    password: order_pass
+
+  jpa:
+    hibernate:
+      ddl-auto: update   # learning only; use Flyway/Liquibase in real projects
+    show-sql: true
+    open-in-view: false
+
+server:
+  port: 8082   # product-service uses 8081
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
