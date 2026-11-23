@@ -2,12 +2,11 @@ package com.shopsphere.product.service;
 
 import com.shopsphere.product.dto.ProductRequest;
 import com.shopsphere.product.dto.ProductResponse;
+import com.shopsphere.product.exception.ProductNotFoundException;
 import com.shopsphere.product.model.Product;
 import com.shopsphere.product.repository.ProductRepository;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -58,8 +57,6 @@ public class ProductService {
     }
 
     private Product getOrThrow(Long id) {
-        // Temporary 404 handling. Lesson 1.5 replaces this with a global exception handler.
-        return repository.findById(id).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found with id " + id));
+        return repository.findById(id).orElseThrow(() -> new ProductNotFoundException(id));
     }
 }

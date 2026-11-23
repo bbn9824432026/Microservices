@@ -4,14 +4,16 @@ import com.shopsphere.order.client.ProductClient;
 import com.shopsphere.order.client.ProductDto;
 import com.shopsphere.order.dto.OrderRequest;
 import com.shopsphere.order.dto.OrderResponse;
+import com.shopsphere.order.exception.InsufficientStockException;
+import com.shopsphere.order.exception.InvalidOrderStateException;
+import com.shopsphere.order.exception.OrderNotFoundException;
+import com.shopsphere.order.exception.ProductDoesNotExistException;
 import com.shopsphere.order.model.Order;
 import com.shopsphere.order.model.OrderStatus;
 import com.shopsphere.order.repository.OrderRepository;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -59,13 +61,10 @@ public class OrderService {
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public OrderResponse create(OrderRequest request) {
         ProductDto product = productClient.getProduct(request.productId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY,
-                        "Product " + request.productId() + " does not exist"));
+                .orElseThrow(() -> new ProductDoesNotExistException(request.productId()));
 
         if (product.stock() < request.quantity()) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT,
-                    "Not enough stock for product " + product.id()
-                            + ": requested " + request.quantity() + ", available " + product.stock());
+            throw new InsufficientStockException(product.id(), request.quantity(), product.stock());
         }
 
         // NOTE: we only CHECK stock here, we do not reduce it. Two orders arriving together could both pass
@@ -79,14 +78,13 @@ public class OrderService {
         try {
             order.cancel(); // the entity enforces the rule; Hibernate saves the change on commit
         } catch (IllegalStateException e) {
-            // 409 Conflict: the request is valid but clashes with the current state of the order
-            throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
+            // Translate the entity's plain Java exception into our business exception (-> HTTP 409)
+            throw new InvalidOrderStateException(e.getMessage());
         }
         return OrderResponse.from(order);
     }
 
     private Order getOrThrow(Long id) {
-        return repository.findById(id).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found with id " + id));
+        return repository.findById(id).orElseThrow(() -> new OrderNotFoundException(id));
     }
 }

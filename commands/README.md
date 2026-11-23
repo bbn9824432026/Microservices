@@ -94,6 +94,7 @@ Check database isolation (Lesson 1.3):
 ```
 
 ## Testing the APIs with curl
+Swagger UI (try calls in the browser): http://localhost:8081/swagger-ui.html (products), http://localhost:8082/swagger-ui.html (orders)
 ```bash
 curl -i http://localhost:8081/actuator/health                                  # health check
 curl -i http://localhost:8081/api/products                                     # GET list
