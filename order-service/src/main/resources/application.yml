@@ -18,6 +18,12 @@ spring:
 server:
   port: 8082   # product-service uses 8081
 
+# Where to find product-service. Hardcoded for now; Lesson 3 replaces this with service discovery.
+product-service:
+  url: http://localhost:8081
+  connect-timeout-ms: 1000   # give up connecting after 1 second
+  read-timeout-ms: 2000      # give up waiting for a reply after 2 seconds
+
 management:
   endpoints:
     web:

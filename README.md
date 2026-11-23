@@ -10,6 +10,7 @@ Every lesson has a notes file in `docs/` and is committed separately.
 | 1.1 | product-service (Spring Boot + JPA + MySQL) | [docs/01-1-product-service.md](docs/01-1-product-service.md) |
 | 1.2 | order-service (own database) | [docs/01-2-order-service.md](docs/01-2-order-service.md) |
 | 1.3 | Database per service (rule + proof) | [docs/01-3-database-per-service.md](docs/01-3-database-per-service.md) |
+| 1.4 | Service-to-service calls with RestClient | [docs/01-4-service-to-service-restclient.md](docs/01-4-service-to-service-restclient.md) |
 
 (More lessons are added as we go.)
 

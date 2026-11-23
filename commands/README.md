@@ -108,6 +108,8 @@ curl -i -X DELETE http://localhost:8081/api/products/1                         #
 ```bash
 ss -ltnp | grep 8081                           # who uses port 8081
 kill <PID>                                     # stop that process
+kill -STOP <PID>                               # freeze a process (simulate a hanging service)
+kill -CONT <PID>                               # unfreeze it
 ```
 
 ## Git (our lesson routine)
