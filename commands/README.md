@@ -88,6 +88,11 @@ SELECT * FROM products;
 ```
 Connection details from your machine: host `localhost`, port **3307**.
 
+Check database isolation (Lesson 1.3):
+```bash
+./scripts/verify-db-isolation.sh
+```
+
 ## Testing the APIs with curl
 ```bash
 curl -i http://localhost:8081/actuator/health                                  # health check

@@ -9,6 +9,7 @@ Every lesson has a notes file in `docs/` and is committed separately.
 | 0 | Setup and architecture | [docs/00-setup-and-architecture.md](docs/00-setup-and-architecture.md) |
 | 1.1 | product-service (Spring Boot + JPA + MySQL) | [docs/01-1-product-service.md](docs/01-1-product-service.md) |
 | 1.2 | order-service (own database) | [docs/01-2-order-service.md](docs/01-2-order-service.md) |
+| 1.3 | Database per service (rule + proof) | [docs/01-3-database-per-service.md](docs/01-3-database-per-service.md) |
 
 (More lessons are added as we go.)
 
