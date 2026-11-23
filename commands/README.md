@@ -93,6 +93,12 @@ Check database isolation (Lesson 1.3):
 ./scripts/verify-db-isolation.sh
 ```
 
+Run the whole Module 1 flow end to end (Lesson 1.6, needs both services running):
+```bash
+./scripts/e2e-module1.sh
+```
+Postman collection: `postman/shopsphere-module1.postman_collection.json`
+
 ## Testing the APIs with curl
 Swagger UI (try calls in the browser): http://localhost:8081/swagger-ui.html (products), http://localhost:8082/swagger-ui.html (orders)
 ```bash

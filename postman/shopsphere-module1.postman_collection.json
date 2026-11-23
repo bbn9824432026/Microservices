@@ -1,0 +1,175 @@
+{
+  "info": {
+    "name": "ShopSphere - Module 1",
+    "description": "Lesson 1.6 checkpoint. Run the folders in order (Setup, Success, Failures). Each request has tests that check the status code. Use the Collection Runner to run them all.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "productUrl", "value": "http://localhost:8081" },
+    { "key": "orderUrl", "value": "http://localhost:8082" },
+    { "key": "productId", "value": "" },
+    { "key": "orderId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "1 Setup + success",
+      "item": [
+        {
+          "name": "Create product (stock 10)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('201 Created', () => pm.response.to.have.status(201));",
+            "pm.test('Location header present', () => pm.response.to.have.header('Location'));",
+            "pm.collectionVariables.set('productId', pm.response.json().id); // reused by later requests"
+          ] } }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Laptop\",\n  \"price\": 55000.50,\n  \"stock\": 10\n}" },
+            "url": "{{productUrl}}/api/products"
+          }
+        },
+        {
+          "name": "Get product",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('200 OK', () => pm.response.to.have.status(200));",
+            "pm.test('stock is 10', () => pm.expect(pm.response.json().stock).to.eql(10));"
+          ] } }],
+          "request": { "method": "GET", "url": "{{productUrl}}/api/products/{{productId}}" }
+        },
+        {
+          "name": "Place order (2 items)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('201 Created', () => pm.response.to.have.status(201));",
+            "pm.test('status is CREATED', () => pm.expect(pm.response.json().status).to.eql('CREATED'));",
+            "pm.collectionVariables.set('orderId', pm.response.json().id);"
+          ] } }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"customerName\": \"Asha\",\n  \"productId\": {{productId}},\n  \"quantity\": 2\n}" },
+            "url": "{{orderUrl}}/api/orders"
+          }
+        },
+        {
+          "name": "Get order",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('200 OK', () => pm.response.to.have.status(200));"
+          ] } }],
+          "request": { "method": "GET", "url": "{{orderUrl}}/api/orders/{{orderId}}" }
+        },
+        {
+          "name": "List orders by customer",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('200 OK', () => pm.response.to.have.status(200));",
+            "pm.test('at least one order', () => pm.expect(pm.response.json().length).to.be.above(0));"
+          ] } }],
+          "request": { "method": "GET", "url": { "raw": "{{orderUrl}}/api/orders?customerName=Asha", "host": ["{{orderUrl}}"], "path": ["api", "orders"], "query": [{ "key": "customerName", "value": "Asha" }] } }
+        },
+        {
+          "name": "Cancel order",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('200 OK', () => pm.response.to.have.status(200));",
+            "pm.test('status is CANCELLED', () => pm.expect(pm.response.json().status).to.eql('CANCELLED'));"
+          ] } }],
+          "request": { "method": "POST", "url": "{{orderUrl}}/api/orders/{{orderId}}/cancel" }
+        }
+      ]
+    },
+    {
+      "name": "2 Failure scenarios",
+      "item": [
+        {
+          "name": "Cancel again -> 409",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('409 Conflict', () => pm.response.to.have.status(409));",
+            "pm.test('Problem Details body', () => pm.expect(pm.response.json().title).to.eql('Conflict'));"
+          ] } }],
+          "request": { "method": "POST", "url": "{{orderUrl}}/api/orders/{{orderId}}/cancel" }
+        },
+        {
+          "name": "Quantity above stock -> 409",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('409 Conflict', () => pm.response.to.have.status(409));"
+          ] } }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"customerName\": \"Asha\",\n  \"productId\": {{productId}},\n  \"quantity\": 11\n}" },
+            "url": "{{orderUrl}}/api/orders"
+          }
+        },
+        {
+          "name": "Unknown product -> 422",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('422 Unprocessable', () => pm.response.to.have.status(422));"
+          ] } }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"customerName\": \"Asha\",\n  \"productId\": 99999999,\n  \"quantity\": 1\n}" },
+            "url": "{{orderUrl}}/api/orders"
+          }
+        },
+        {
+          "name": "Invalid order body -> 400 with errors",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('400 Bad Request', () => pm.response.to.have.status(400));",
+            "pm.test('errors lists 3 fields', () => pm.expect(Object.keys(pm.response.json().errors).length).to.eql(3));"
+          ] } }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"customerName\": \"\",\n  \"productId\": 0,\n  \"quantity\": 0\n}" },
+            "url": "{{orderUrl}}/api/orders"
+          }
+        },
+        {
+          "name": "Order not found -> 404",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('404 Not Found', () => pm.response.to.have.status(404));"
+          ] } }],
+          "request": { "method": "GET", "url": "{{orderUrl}}/api/orders/99999999" }
+        },
+        {
+          "name": "Invalid product body -> 400",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('400 Bad Request', () => pm.response.to.have.status(400));",
+            "pm.test('errors lists 3 fields', () => pm.expect(Object.keys(pm.response.json().errors).length).to.eql(3));"
+          ] } }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"\",\n  \"price\": -1,\n  \"stock\": -1\n}" },
+            "url": "{{productUrl}}/api/products"
+          }
+        },
+        {
+          "name": "Product not found -> 404",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('404 Not Found', () => pm.response.to.have.status(404));"
+          ] } }],
+          "request": { "method": "GET", "url": "{{productUrl}}/api/products/99999999" }
+        }
+      ]
+    },
+    {
+      "name": "3 Manual: dependency down",
+      "description": "Stop product-service first (Ctrl+C in its terminal), then send this request. Start it again afterwards.",
+      "item": [
+        {
+          "name": "Place order while product-service is DOWN -> 503",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('503 Service Unavailable', () => pm.response.to.have.status(503));",
+            "pm.test('came back quickly (timeouts work)', () => pm.expect(pm.response.responseTime).to.be.below(4000));"
+          ] } }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"customerName\": \"Asha\",\n  \"productId\": {{productId}},\n  \"quantity\": 1\n}" },
+            "url": "{{orderUrl}}/api/orders"
+          }
+        }
+      ]
+    }
+  ]
+}
